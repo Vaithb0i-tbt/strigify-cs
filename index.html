@@ -2,34 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bloxd.io Script Loader (Hidden)</title>
+  <title>Bloxd.io Script Hider</title>
   <style>
     body {
-      font-family: sans-serif;
-      user-select: none;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+    .output {
+      white-space: pre-wrap;
+      background: #f3f3f3;
+      padding: 10px;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <h2>Loading your script into Bloxd.io...</h2>
+  <h1>Bloxd.io Script Hider</h1>
+  <p>Upload a .txt file to encode its contents and generate hidden code you can paste into Bloxd.io.</p>
+
+  <input type="file" id="fileInput" accept=".txt"><br><br>
+  <button onclick="processFile()">Convert and Generate</button>
+
+  <h3>Base64 Encoded:</h3>
+  <div class="output" id="base64Output"></div>
+
+  <h3>Bloxd Code Snippet:</h3>
+  <textarea readonly id="bloxdCode"></textarea>
 
   <script>
-    // Prevent right-click and basic copying
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && ['c', 'u', 's', 'i', 'j'].includes(e.key.toLowerCase())) {
-        e.preventDefault();
-      }
-    });
+    function base64Encode(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
 
-    // This would be your BLOXD.IO script (obfuscated or encoded)
-    const encodedScript = "Ly8gRXhhbXBsZSBzY3JpcHQgZm9yIEJsb3hkLmlvIGN1c3RvbSBldmVudCBob29rcwpldmVudExpc3RlbmVyKCJrZXlkb3duIiwgKGUpID0+IHsKICBpZiAoZS5rZXkgPT09ICJZIjogLy8gUnVuIGZ1bmN0aW9uIHdoZW4gWSBpcyBwcmVzc2VkCiAgICBhbGVydCgiWSBwcmVzc2VkIik7Cn0pOw==";
+    function processFile() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return alert("Please select a .txt file first.");
 
-    // Decode and run
-    const decoded = atob(encodedScript);
-    const script = document.createElement('script');
-    script.textContent = decoded;
-    document.body.appendChild(script);
+      const reader = new FileReader();
+      reader.onload = function () {
+        const text = reader.result;
+        const encoded = base64Encode(text);
+        document.getElementById('base64Output').textContent = encoded;
+
+        // Generate Bloxd.io-compatible decoding code
+        const bloxdSnippet = `
+function base64Decode(str) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  let output = "";
+  let buffer = 0, bits = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '=') break;
+    buffer = (buffer << 6) + chars.indexOf(str[i]);
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      output += String.fromCharCode((buffer >> bits) & 0xFF);
+    }
+  }
+
+  return output;
+}
+
+const hiddenData = "${encoded}";
+const decoded = base64Decode(hiddenData);
+console.log(decoded);
+// Use decoded in your game logic
+        `.trim();
+
+        document.getElementById('bloxdCode').value = bloxdSnippet;
+      };
+      reader.readAsText(file);
+    }
   </script>
 </body>
 </html>
