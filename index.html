@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bloxd.io stingifier</title>
+  <title>Bloxd.io Script Hider</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -37,30 +37,38 @@
   <textarea readonly id="bloxdCode"></textarea>
 
   <script>
+    // Base64 encoding function
     function base64Encode(str) {
       return btoa(unescape(encodeURIComponent(str)));
     }
 
+    // Main function to process file and generate base64 and code snippet
     function processFile() {
       const file = document.getElementById('fileInput').files[0];
-      if (!file) return alert("Please select a .txt file first.");
+      if (!file) {
+        alert("Please select a .txt file first.");
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = function () {
-        const text = reader.result;
-        const encoded = base64Encode(text);
+        const text = reader.result;  // The text content of the uploaded file
+        const encoded = base64Encode(text);  // Base64 encode the file's content
+
+        // Display the base64 encoded content
         document.getElementById('base64Output').textContent = encoded;
 
         // Generate Bloxd.io-compatible decoding code
         const bloxdSnippet = `
 function base64Decode(str) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
   let output = "";
   let buffer = 0, bits = 0;
 
   for (let i = 0; i < str.length; i++) {
-    if (str[i] === '=') break;
-    buffer = (buffer << 6) + chars.indexOf(str[i]);
+    const char = str[i];
+    if (char === '=') break;
+    buffer = (buffer << 6) + chars.indexOf(char);
     bits += 6;
     if (bits >= 8) {
       bits -= 8;
@@ -76,8 +84,11 @@ const decoded = base64Decode(hiddenData);
 // Now you can safely use `decoded` in your Bloxd.io game logic
         `.trim();
 
+        // Display the Bloxd code snippet
         document.getElementById('bloxdCode').value = bloxdSnippet;
       };
+
+      // Read the file as text
       reader.readAsText(file);
     }
   </script>
