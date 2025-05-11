@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bloxd-Safe TXT to JS Obfuscator</title>
+  <title>Bloxd.io Script Converter</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     pre { background: #111; color: #0f0; padding: 10px; overflow-x: auto; white-space: pre-wrap; }
   </style>
 </head>
 <body>
-  <h1>Bloxd.io-Safe JS Obfuscator</h1>
-  <input type="file" id="fileInput" accept=".txt" /><br/><br/>
-  <button onclick="convert()">Convert & Obfuscate</button>
+  <h1>Safe Script Converter for bloxd.io</h1>
+  <input type="file" id="fileInput" accept=".txt"><br><br>
+  <button onclick="convert()">Convert</button>
   <h2>Output:</h2>
   <pre id="output"></pre>
 
@@ -25,21 +24,19 @@
       reader.onload = function(e) {
         fileContent = e.target.result;
       };
-      if (file) {
-        reader.readAsText(file);
-      }
+      if (file) reader.readAsText(file);
     });
 
     function convert() {
       if (!fileContent) {
-        alert("Upload a .txt file first.");
+        alert("Please upload a .txt file first.");
         return;
       }
 
       const charCodes = Array.from(fileContent).map(c => c.charCodeAt(0));
-      const jsCode = `(function(){const c=[${charCodes.join(",")}];let s="";for(let i=0;i<c.length;i++)s+=String.fromCharCode(c[i]);eval(s);})();`;
+      const safeWrapper = `(()=>{let chars=[${charCodes.join(",")}];let out='';for(let i=0;i<chars.length;i++)out+=String.fromCharCode(chars[i]);(1,eval)(out);})();`;
 
-      document.getElementById('output').textContent = jsCode;
+      document.getElementById('output').textContent = safeWrapper;
     }
   </script>
 </body>
