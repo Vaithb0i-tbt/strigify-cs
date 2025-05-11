@@ -2,15 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>JS Encryptor from TXT</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Bloxed.io JS Encryptor</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    textarea { width: 100%; height: 300px; margin-top: 10px; }
+  </style>
 </head>
 <body>
-  <h1>Secure JS Encryptor (from .txt)</h1>
+  <h2>Bloxed.io JS Encryptor (from .txt)</h2>
   <input type="file" id="txtFile" accept=".txt" />
-  <button id="encryptBtn">Encrypt</button>
-  <div id="output"></div>
+  <button id="encryptBtn">Encrypt & Generate Loader</button>
+  <textarea id="output" readonly placeholder="Encrypted loader will appear here..."></textarea>
 
-  <script type="module" src="app.js"></script>
+  <script>
+    document.getElementById("encryptBtn").addEventListener("click", async () => {
+      const file = document.getElementById("txtFile").files[0];
+      if (!file) return alert("Upload a .txt file.");
+      const jsCode = await file.text();
+
+      const key = crypto.getRandomValues(new Uint8Array(32));
+      const iv = crypto.getRandomValues(new Uint8Array(16));
+      const encoder = new TextEncoder();
+      const data = encoder.encode(jsCode);
+
+      const cryptoKey = await crypto.subtle.importKey("raw", key, "AES-CBC", false, ["encrypt"]);
+      const encrypted = await crypto.subtle.encrypt({ name: "AES-CBC", iv }, cryptoKey, data);
+
+      const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+      const keyBase64 = btoa(String.fromCharCode(...key));
+      const ivBase64 = btoa(String.fromCharCode(...iv));
+
+      const loader = `(async () => {
+  const keyBase64 = "${keyBase64}";
+  const ivBase64 = "${ivBase64}";
+  const encryptedBase64 = "${encryptedBase64}";
+
+  const key = Uint8Array.from(atob(keyBase64), c => c.charCodeAt(0));
+  const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+  const cryptoKey = await crypto.subtle.importKey("raw", key, "AES-CBC", false, ["decrypt"]);
+
+  const encryptedBytes = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+  const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv }, cryptoKey, encryptedBytes);
+  const code = new TextDecoder().decode(decrypted);
+
+  eval(code);
+})();`;
+
+      document.getElementById("output").value = loader;
+    });
+  </script>
 </body>
 </html>
