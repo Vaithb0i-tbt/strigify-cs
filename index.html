@@ -1,43 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bloxd.io Script Converter</title>
+  <meta charset="UTF-8">
+  <title>Bloxd.io Script Loader (Hidden)</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    pre { background: #111; color: #0f0; padding: 10px; overflow-x: auto; white-space: pre-wrap; }
+    body {
+      font-family: sans-serif;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
-  <h1>Safe Script Converter for bloxd.io</h1>
-  <input type="file" id="fileInput" accept=".txt"><br><br>
-  <button onclick="convert()">Convert</button>
-  <h2>Output:</h2>
-  <pre id="output"></pre>
+  <h2>Loading your script into Bloxd.io...</h2>
 
   <script>
-    let fileContent = "";
-
-    document.getElementById('fileInput').addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        fileContent = e.target.result;
-      };
-      if (file) reader.readAsText(file);
+    // Prevent right-click and basic copying
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && ['c', 'u', 's', 'i', 'j'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
     });
 
-    function convert() {
-      if (!fileContent) {
-        alert("Please upload a .txt file first.");
-        return;
-      }
+    // This would be your BLOXD.IO script (obfuscated or encoded)
+    const encodedScript = "Ly8gRXhhbXBsZSBzY3JpcHQgZm9yIEJsb3hkLmlvIGN1c3RvbSBldmVudCBob29rcwpldmVudExpc3RlbmVyKCJrZXlkb3duIiwgKGUpID0+IHsKICBpZiAoZS5rZXkgPT09ICJZIjogLy8gUnVuIGZ1bmN0aW9uIHdoZW4gWSBpcyBwcmVzc2VkCiAgICBhbGVydCgiWSBwcmVzc2VkIik7Cn0pOw==";
 
-      const charCodes = Array.from(fileContent).map(c => c.charCodeAt(0));
-      const safeWrapper = `(()=>{let chars=[${charCodes.join(",")}];let out='';for(let i=0;i<chars.length;i++)out+=String.fromCharCode(chars[i]);(1,eval)(out);})();`;
-
-      document.getElementById('output').textContent = safeWrapper;
-    }
+    // Decode and run
+    const decoded = atob(encodedScript);
+    const script = document.createElement('script');
+    script.textContent = decoded;
+    document.body.appendChild(script);
   </script>
 </body>
 </html>
