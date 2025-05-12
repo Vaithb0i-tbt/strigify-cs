@@ -2,29 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Steganographic Code Embedding</title>
+    <title>Auto-Camouflage Code Embedding</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div class="bg-white shadow-2xl rounded-xl p-8 w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Steganographic Code Embedding</h1>
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Auto-Camouflage Code Embedding</h1>
         <p class="text-center text-gray-600 mb-6">
-            Embed your code within seemingly innocent text files with multi-layer encryption and camouflage.
+            Automatically generate camouflage text to hide your code with multi-layer encryption.
         </p>
 
         <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-4">
                 <div>
                     <label class="block text-gray-700 font-bold mb-2">Code to Embed</label>
-                    <textarea id="codeInput" rows="6" class="w-full border rounded p-2 bg-gray-50" 
+                    <textarea id="codeInput" rows="8" class="w-full border rounded p-2 bg-gray-50" 
                         placeholder="Paste your code here..."></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2">Camouflage Text</label>
-                    <textarea id="camouflageText" rows="4" class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Enter text to hide your code within..."></textarea>
                 </div>
 
                 <div>
@@ -42,7 +36,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-gray-700 font-bold mb-2">Extraction Text</label>
-                    <textarea id="extractionText" rows="6" class="w-full border rounded p-2 bg-gray-50" 
+                    <textarea id="extractionText" rows="8" class="w-full border rounded p-2 bg-gray-50" 
                         placeholder="Paste embedded text here..."></textarea>
                 </div>
 
@@ -66,12 +60,54 @@
     </div>
 
     <script>
-        class StegoCoder {
+        class AutoCamouflageStegoCoder {
             constructor() {
-                this.MAGIC_MARKER = 'STEGO_V1_';
+                this.MAGIC_MARKER = 'AUTOCAMO_V1_';
+                this.lorem = [
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
+                    "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui.",
+                    "Nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+                    "Sed ut perspiciatis unde omnis iste natus error sit voluptatem.",
+                    "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut.",
+                    "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.",
+                    "Consectetur, adipisci velit, sed quia non numquam eius modi tempora."
+                ];
+                this.technicalTerms = [
+                    "algorithm", "encryption", "steganography", "cryptography", 
+                    "decryption", "blockchain", "cybersecurity", "network", 
+                    "protocol", "data", "information", "system", "software"
+                ];
             }
 
-            embedCode(code, camouflageText, key) {
+            generateCamouflageText(length = 50) {
+                const sentences = [];
+                let currentLength = 0;
+
+                while (currentLength < length) {
+                    // Mix lorem ipsum with technical terms
+                    const loremSentence = this.lorem[Math.floor(Math.random() * this.lorem.length)];
+                    const technicalWord = this.technicalTerms[Math.floor(Math.random() * this.technicalTerms.length)];
+                    
+                    // Randomly inject technical term
+                    const modifiedSentence = loremSentence.replace(
+                        this.lorem[0].split(' ')[Math.floor(Math.random() * 5)],
+                        technicalWord
+                    );
+
+                    sentences.push(modifiedSentence);
+                    currentLength += modifiedSentence.length;
+                }
+
+                return sentences.join(' ');
+            }
+
+            embedCode(code, key) {
+                // Generate camouflage text
+                const camouflageText = this.generateCamouflageText();
+                
                 // Compress and encrypt the code
                 const compressedCode = this.compress(code);
                 const encryptedCode = this.encrypt(compressedCode, key);
@@ -166,20 +202,14 @@
             }
         }
 
-        const stegoCoder = new StegoCoder();
+        const autoCamouflageStegoCoder = new AutoCamouflageStegoCoder();
 
         function embedCode() {
             const codeInput = document.getElementById('codeInput');
-            const camouflageText = document.getElementById('camouflageText');
             const encryptionKey = document.getElementById('encryptionKey');
 
             if (!codeInput.value.trim()) {
                 alert('Please enter code to embed!');
-                return;
-            }
-
-            if (!camouflageText.value.trim()) {
-                alert('Please provide camouflage text!');
                 return;
             }
 
@@ -189,9 +219,8 @@
             }
 
             try {
-                const embeddedText = stegoCoder.embedCode(
+                const embeddedText = autoCamouflageStegoCoder.embedCode(
                     codeInput.value, 
-                    camouflageText.value, 
                     encryptionKey.value
                 );
 
@@ -225,7 +254,7 @@
             }
 
             try {
-                const extractedCode = stegoCoder.extractCode(
+                const extractedCode = autoCamouflageStegoCoder.extractCode(
                     extractionText.value, 
                     decryptionKey.value
                 );
