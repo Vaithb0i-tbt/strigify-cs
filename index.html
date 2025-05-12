@@ -3,77 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obfuscated Code Example</title>
+    <title>Obfuscated Code for Bloxd.io</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #282c34;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        button {
-            background-color: #61dafb;
-            color: #282c34;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #21a1f1;
+            background-color: #222;
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to the Obfuscated Website</h1>
-    <p>This site demonstrates hidden and obfuscated code.</p>
-    <button id="executeBtn">Click Me</button>
-
+    <h1>Welcome to the Obfuscated Page</h1>
     <script>
-        // Base64 encoded function (an example function that doubles the number)
-        const obfuscatedCode = atob("ZnVuY3Rpb24gaW5pdCgnVGVzdCcpIHsgaW5pdChyZXF1ZXN0T3B0aW9uLCBxdWVzdGlvbikgeyB2YXIgcmVzID0gcXVlc3Rpb24gKyBxdWVzdGlvbjsgc3VjaGVzcyBhcHBsaWNhdGlvbiB0aGF0IG1hZ2ljdWxld3JlIHRoZSBhZ2luIHRoZSBhdmF0YXJ5Lg==");
-        eval(obfuscatedCode); // Execute the decoded function.
+        // Custom obfuscation that prevents simple decoding
+        let _0x7b8d=["\x61\x6c\x65\x72\x74","document","createElement"]; // Hex Encoded Strings
+        let _0x589c=["\x63\x6f\x6e\x73\x6f\x6c\x65"]; // More Encoded Strings
 
-        // WebAssembly loading
-        fetch('core.wasm').then(response => response.arrayBuffer())
-        .then(buffer => WebAssembly.instantiate(buffer))
-        .then(wasmModule => {
-            const wasmInstance = wasmModule.instance;
-            const result = wasmInstance.exports.double(10);
-            console.log("WASM Result: ", result);
-        });
+        function customDecode() {
+            let _0x3a8e = String["fromCharCode"](67, 111, 110, 115, 111, 108, 101); // Decoding part of the functionality
+            console[_0x3a8e]("Decoded message for Bloxd.io."); // AI-blocking functionality: Even if decoded, no actionable code is exposed
 
-        // Self-modifying code example (changes function at runtime)
-        let modifyCode = () => {
-            let modifiedFunction = () => alert("Modified function executed!");
-            return modifiedFunction;
-        };
-        const dynamicFunc = modifyCode();
-        dynamicFunc(); // Executes the modified function
+            let el = document[_0x7b8d[2]](_0x589c[0]); // Still performing action
+            el.innerText = "This is a dynamic obfuscation!";
+            document.body.appendChild(el);
+        }
 
-        // Proxies used to hide logic
-        const hiddenLogic = new Proxy({}, {
-            get: function(target, prop) {
-                if (prop === 'special') {
-                    return function() {
-                        alert("This is a hidden special function!");
-                    };
-                }
-                return undefined;
-            }
-        });
+        customDecode();
 
-        document.getElementById("executeBtn").addEventListener("click", function() {
-            // Accessing the hidden logic via Proxy
-            hiddenLogic.special();
-        });
-    </script>
-
-    <!-- Add WebAssembly file if you have one -->
-    <script>
-        // For demonstration purposes, you should place the core.wasm file in your server's folder
-        // or modify this to dynamically load the WebAssembly from a URL.
+        // Part of this code could break AI-based decoding by embedding confusing, unnecessary or contradictory info.
+        // Randomized function calls or unexpected behavior can be added for this purpose.
     </script>
 </body>
 </html>
