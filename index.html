@@ -1,122 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Stealing Prevention Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .password-container {
-            display: none;
-            margin-top: 20px;
-        }
-        input {
-            padding: 8px;
-            width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>100% HML JS Obfuscator</title>
 </head>
 <body>
+  <h1>Homemade JS Obfuscator (Browser-based)</h1>
+  <textarea id="inputCode" rows="10" cols="80" placeholder="Enter your JavaScript here..."></textarea><br>
+  <button onclick="obfuscate()">Obfuscate</button>
+  <h3>Obfuscated Output:</h3>
+  <textarea id="outputCode" rows="10" cols="80"></textarea><br>
+  <button onclick="runObfuscated()">Run Obfuscated Code</button>
 
-    <h1>Code Stealing Prevention Tool</h1>
+  <script>
+    function encodeString(str) {
+      return str.split('').map(c => '\\x' + c.charCodeAt(0).toString(16)).join('');
+    }
 
-    <p>Enter your JavaScript code below to obfuscate it:</p>
-    <textarea id="codeInput" placeholder="Enter your JavaScript code here..."></textarea><br>
+    function renameVars(code) {
+      const varRegex = /\b(var|let|const)\s+(\w+)/g;
+      let count = 0;
+      let varMap = {};
+      code = code.replace(varRegex, (match, decl, name) => {
+        const newName = '_0x' + (count++).toString(36);
+        varMap[name] = newName;
+        return `${decl} ${newName}`;
+      });
+      code = code.replace(/\b\w+\b/g, (word) => varMap[word] || word);
+      return code;
+    }
 
-    <label for="password">Set a password to decode your code (optional):</label>
-    <input type="password" id="password" placeholder="Password"><br>
+    function obfuscate() {
+      const code = document.getElementById('inputCode').value;
+      const renamed = renameVars(code);
+      const encoded = encodeString(renamed);
+      document.getElementById('outputCode').value = `eval("${encoded}")`;
+    }
 
-    <button onclick="obfuscateCode()">Obfuscate Code</button>
-
-    <h2>Obfuscated Code:</h2>
-    <textarea id="obfuscatedCode" readonly placeholder="Obfuscated code will appear here..."></textarea><br>
-
-    <div class="password-container">
-        <label for="decodePassword">Enter the password to decode your code:</label>
-        <input type="password" id="decodePassword" placeholder="Password"><br>
-        <button onclick="decodeCode()">Decode Code</button>
-    </div>
-
-    <h2>Decoded Code:</h2>
-    <textarea id="decodedCode" readonly placeholder="Decoded code will appear here..."></textarea>
-
-    <script>
-        // Function to obfuscate the input code
-        function obfuscateCode() {
-            const codeInput = document.getElementById('codeInput').value;
-            const password = document.getElementById('password').value;
-            let obfuscated = '';
-
-            // Obfuscate by converting each character to ASCII codes
-            for (let i = 0; i < codeInput.length; i++) {
-                obfuscated += (codeInput.charCodeAt(i) + Math.floor(Math.random() * 10)) + '|';
-            }
-
-            // If a password is set, include it in the obfuscated code
-            if (password) {
-                obfuscated = encodePassword(password) + '|' + obfuscated;
-                document.querySelector('.password-container').style.display = 'block';
-            } else {
-                document.querySelector('.password-container').style.display = 'none';
-            }
-
-            document.getElementById('obfuscatedCode').value = obfuscated;
-        }
-
-        // Function to decode the obfuscated code using the password
-        function decodeCode() {
-            const obfuscatedCode = document.getElementById('obfuscatedCode').value;
-            const password = document.getElementById('decodePassword').value;
-
-            const passwordFromObfuscated = obfuscatedCode.split('|')[0];
-            if (password && password !== decodePassword(passwordFromObfuscated)) {
-                alert('Incorrect password!');
-                return;
-            }
-
-            // Remove the password part and decode the rest
-            const codePart = obfuscatedCode.split('|').slice(1).join('|');
-            let decoded = '';
-            const numbers = codePart.split('|');
-            for (let i = 0; i < numbers.length; i++) {
-                const num = parseInt(numbers[i], 10);
-                if (!isNaN(num)) {
-                    decoded += String.fromCharCode(num - Math.floor(Math.random() * 10)); // Reverse random noise
-                }
-            }
-
-            document.getElementById('decodedCode').value = decoded;
-        }
-
-        // Function to encode the password into ASCII
-        function encodePassword(password) {
-            return password.split('').map(char => char.charCodeAt(0)).join('|');
-        }
-
-        // Function to decode the password from ASCII
-        function decodePassword(encodedPassword) {
-            return encodedPassword.split('|').map(code => String.fromCharCode(parseInt(code, 10))).join('');
-        }
-    </script>
-
+    function runObfuscated() {
+      const obfuscated = document.getElementById('outputCode').value;
+      eval(obfuscated);
+    }
+  </script>
 </body>
 </html>
