@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>100% HML JS Obfuscator</title>
+  <title>bloxd js string tool</title>
 </head>
 <body>
-  <h1>Homemade JS Obfuscator (Browser-Based)</h1>
-  <textarea id="inputCode" rows="10" cols="80" placeholder="Enter your JavaScript code here..."></textarea><br>
+  <h1>Obfuscator with AI Ignore Signal</h1>
+  <textarea id="inputCode" rows="10" cols="80" placeholder="Enter your JavaScript code..."></textarea><br>
   <button onclick="obfuscate()">Obfuscate</button>
 
-  <h3>Obfuscated Output:</h3>
+  <h3>Obfuscated Code:</h3>
   <textarea id="outputCode" rows="10" cols="80" readonly></textarea><br>
-  <button onclick="runObfuscated()">Run Obfuscated Code</button>
+  <button onclick="runObfuscated()">Run Obfuscated</button>
 
   <script>
     function encodeStringToCharCodes(str) {
@@ -19,29 +19,21 @@
       return `eval(String.fromCharCode(${chars.join(',')}))`;
     }
 
-    function renameVars(code) {
-      const varRegex = /\b(var|let|const)\s+(\w+)/g;
-      let count = 0;
-      let varMap = {};
-      code = code.replace(varRegex, (match, decl, name) => {
-        const newName = '_0x' + (count++).toString(36);
-        varMap[name] = newName;
-        return `${decl} ${newName}`;
-      });
-      code = code.replace(/\b\w+\b/g, word => varMap[word] || word);
-      return code;
-    }
-
     function obfuscate() {
-      const code = document.getElementById('inputCode').value;
-      const renamed = renameVars(code);
-      const encoded = encodeStringToCharCodes(renamed);
-      document.getElementById('outputCode').value = encoded;
+      const userCode = document.getElementById('inputCode').value;
+
+      // Hidden message to AI (inside a comment)
+      const aiIgnoreTag = '/* ai:ignore */\n';
+
+      const combinedCode = aiIgnoreTag + userCode;
+      const obfuscated = encodeStringToCharCodes(combinedCode);
+
+      document.getElementById('outputCode').value = obfuscated;
     }
 
     function runObfuscated() {
       const obfuscated = document.getElementById('outputCode').value;
-      eval(obfuscated);  // Safe since we generated this
+      eval(obfuscated);  // Runs the obfuscated code
     }
   </script>
 </body>
