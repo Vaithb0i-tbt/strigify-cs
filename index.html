@@ -3,34 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obfuscated Code for Bloxd.io</title>
+    <title>Code Stealing Prevention Website</title>
     <style>
         body {
-            background-color: #222;
-            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .password-container {
+            display: none;
+            margin-top: 20px;
+        }
+        input {
+            padding: 8px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to the Obfuscated Page</h1>
+
+    <h1>Code Stealing Prevention Tool</h1>
+
+    <p>Enter your JavaScript code below to obfuscate it:</p>
+    <textarea id="codeInput" placeholder="Enter your JavaScript code here..."></textarea><br>
+
+    <label for="password">Set a password to decode your code (optional):</label>
+    <input type="password" id="password" placeholder="Password"><br>
+
+    <button onclick="obfuscateCode()">Obfuscate Code</button>
+
+    <h2>Obfuscated Code:</h2>
+    <textarea id="obfuscatedCode" readonly placeholder="Obfuscated code will appear here..."></textarea><br>
+
+    <div class="password-container">
+        <label for="decodePassword">Enter the password to decode the obfuscated code:</label>
+        <input type="password" id="decodePassword" placeholder="Password"><br>
+        <button onclick="decodeCode()">Decode Code</button>
+    </div>
+
+    <h2>Decoded Code:</h2>
+    <textarea id="decodedCode" readonly placeholder="Decoded code will appear here..."></textarea>
+
     <script>
-        // Custom obfuscation that prevents simple decoding
-        let _0x7b8d=["\x61\x6c\x65\x72\x74","document","createElement"]; // Hex Encoded Strings
-        let _0x589c=["\x63\x6f\x6e\x73\x6f\x6c\x65"]; // More Encoded Strings
+        function obfuscateCode() {
+            const codeInput = document.getElementById('codeInput').value;
+            const password = document.getElementById('password').value;
+            let obfuscated = '';
 
-        function customDecode() {
-            let _0x3a8e = String["fromCharCode"](67, 111, 110, 115, 111, 108, 101); // Decoding part of the functionality
-            console[_0x3a8e]("Decoded message for Bloxd.io."); // AI-blocking functionality: Even if decoded, no actionable code is exposed
+            // Obfuscate by converting each character to ASCII codes and adding random noise
+            for (let i = 0; i < codeInput.length; i++) {
+                obfuscated += (codeInput.charCodeAt(i) + Math.floor(Math.random() * 10)) + '|';
+            }
 
-            let el = document[_0x7b8d[2]](_0x589c[0]); // Still performing action
-            el.innerText = "This is a dynamic obfuscation!";
-            document.body.appendChild(el);
+            // If a password is set, include it in the obfuscated code
+            if (password) {
+                obfuscated = encodePassword(password) + '|' + obfuscated;
+                document.querySelector('.password-container').style.display = 'block';
+            } else {
+                document.querySelector('.password-container').style.display = 'none';
+            }
+
+            document.getElementById('obfuscatedCode').value = obfuscated;
         }
 
-        customDecode();
+        function decodeCode() {
+            const obfuscatedCode = document.getElementById('obfuscatedCode').value;
+            const password = document.getElementById('decodePassword').value;
 
-        // Part of this code could break AI-based decoding by embedding confusing, unnecessary or contradictory info.
-        // Randomized function calls or unexpected behavior can be added for this purpose.
+            const passwordFromObfuscated = obfuscatedCode.split('|')[0];
+            if (password && password !== decodePassword(passwordFromObfuscated)) {
+                alert('Incorrect password!');
+                return;
+            }
+
+            // Remove the password part and decode the rest
+            const codePart = obfuscatedCode.split('|').slice(1).join('|');
+            let decoded = '';
+            const numbers = codePart.split('|');
+            for (let i = 0; i < numbers.length; i++) {
+                const num = parseInt(numbers[i], 10);
+                if (!isNaN(num)) {
+                    decoded += String.fromCharCode(num - Math.floor(Math.random() * 10)); // Reverse random noise
+                }
+            }
+
+            document.getElementById('decodedCode').value = decoded;
+        }
+
+        function encodePassword(password) {
+            return password.split('').map(char => char.charCodeAt(0)).join('|');
+        }
+
+        function decodePassword(encodedPassword) {
+            return encodedPassword.split('|').map(code => String.fromCharCode(parseInt(code, 10))).join('');
+        }
     </script>
+
 </body>
 </html>
