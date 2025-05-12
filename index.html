@@ -51,7 +51,7 @@
     <textarea id="obfuscatedCode" readonly placeholder="Obfuscated code will appear here..."></textarea><br>
 
     <div class="password-container">
-        <label for="decodePassword">Enter the password to decode the obfuscated code:</label>
+        <label for="decodePassword">Enter the password to decode your code:</label>
         <input type="password" id="decodePassword" placeholder="Password"><br>
         <button onclick="decodeCode()">Decode Code</button>
     </div>
@@ -60,12 +60,13 @@
     <textarea id="decodedCode" readonly placeholder="Decoded code will appear here..."></textarea>
 
     <script>
+        // Function to obfuscate the input code
         function obfuscateCode() {
             const codeInput = document.getElementById('codeInput').value;
             const password = document.getElementById('password').value;
             let obfuscated = '';
 
-            // Obfuscate by converting each character to ASCII codes and adding random noise
+            // Obfuscate by converting each character to ASCII codes
             for (let i = 0; i < codeInput.length; i++) {
                 obfuscated += (codeInput.charCodeAt(i) + Math.floor(Math.random() * 10)) + '|';
             }
@@ -81,6 +82,7 @@
             document.getElementById('obfuscatedCode').value = obfuscated;
         }
 
+        // Function to decode the obfuscated code using the password
         function decodeCode() {
             const obfuscatedCode = document.getElementById('obfuscatedCode').value;
             const password = document.getElementById('decodePassword').value;
@@ -105,10 +107,12 @@
             document.getElementById('decodedCode').value = decoded;
         }
 
+        // Function to encode the password into ASCII
         function encodePassword(password) {
             return password.split('').map(char => char.charCodeAt(0)).join('|');
         }
 
+        // Function to decode the password from ASCII
         function decodePassword(encodedPassword) {
             return encodedPassword.split('|').map(code => String.fromCharCode(parseInt(code, 10))).join('');
         }
