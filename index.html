@@ -1,246 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Code Steganography</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .copy-tooltip {
-            position: relative;
-        }
-        .copy-tooltip::after {
-            content: 'Copied!';
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: green;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .copy-tooltip:active::after {
-            opacity: 1;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Code Steganography</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .copy-tooltip {
+      position: relative;
+    }
+    .copy-tooltip::after {
+      content: 'Copied!';
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: green;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .copy-tooltip:active::after {
+      opacity: 1;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-4xl">
-        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">🕵️ Steganographic Code Embedding</h1>
-        
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2">Code to Hide</label>
-                    <textarea id="codeInput" rows="8" class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Enter the code you want to hide..."></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2">Secret Key</label>
-                    <input type="password" id="encryptionKey" 
-                        class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Enter a secret encryption key">
-                </div>
-
-                <button onclick="embedCode()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                    Hide Code
-                </button>
-
-                <div class="mt-4">
-                    <label class="block text-gray-700 font-bold mb-2">Embedded Text</label>
-                    <div class="relative">
-                        <textarea id="embeddedText" rows="6" readonly 
-                            class="w-full border rounded p-2 bg-gray-100" 
-                            placeholder="Embedded text will appear here..."></textarea>
-                        <button onclick="copyEmbeddedText()" 
-                            class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded copy-tooltip">
-                            📋 Copy
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2">Text to Extract From</label>
-                    <textarea id="extractionText" rows="8" class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Paste the text containing hidden code..."></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 font-bold mb-2">Decryption Key</label>
-                    <input type="password" id="decryptionKey" 
-                        class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Enter the secret encryption key">
-                </div>
-
-                <button onclick="extractCode()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
-                    Extract Code
-                </button>
-
-                <div class="mt-4">
-                    <label class="block text-gray-700 font-bold mb-2">Extracted Code</label>
-                    <div class="relative">
-                        <textarea id="extractedCode" rows="6" readonly 
-                            class="w-full border rounded p-2 bg-gray-100" 
-                            placeholder="Extracted code will appear here..."></textarea>
-                        <button onclick="copyExtractedCode()" 
-                            class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded copy-tooltip">
-                            📋 Copy
-                        </button>
-                    </div>
-                </div>
-            </div>
+  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-4xl">
+    <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">🕵️ Steganographic Code Embedding</h1>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Code to Hide</label>
+          <textarea id="codeInput" rows="8" class="w-full border rounded p-2 bg-gray-50"
+            placeholder="Enter the code you want to hide..."></textarea>
         </div>
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Secret Key</label>
+          <input type="password" id="encryptionKey" class="w-full border rounded p-2 bg-gray-50"
+            placeholder="Enter a secret encryption key">
+        </div>
+        <button onclick="embedCode()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+          Hide Code
+        </button>
+        <div class="mt-4">
+          <label class="block text-gray-700 font-bold mb-2">Embedded Text</label>
+          <div class="relative">
+            <textarea id="embeddedText" rows="6" readonly class="w-full border rounded p-2 bg-gray-100"
+              placeholder="Embedded text will appear here..."></textarea>
+            <button onclick="copyEmbeddedText()" class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded copy-tooltip">
+              📋 Copy
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Text to Extract From</label>
+          <textarea id="extractionText" rows="8" class="w-full border rounded p-2 bg-gray-50"
+            placeholder="Paste the text containing hidden code..."></textarea>
+        </div>
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Decryption Key</label>
+          <input type="password" id="decryptionKey" class="w-full border rounded p-2 bg-gray-50"
+            placeholder="Enter the secret encryption key">
+        </div>
+        <button onclick="extractCode()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+          Extract Code
+        </button>
+        <div class="mt-4">
+          <label class="block text-gray-700 font-bold mb-2">Extracted Code</label>
+          <div class="relative">
+            <textarea id="extractedCode" rows="6" readonly class="w-full border rounded p-2 bg-gray-100"
+              placeholder="Extracted code will appear here..."></textarea>
+            <button onclick="copyExtractedCode()"
+              class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded copy-tooltip">
+              📋 Copy
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        class SeamlessSteganographer {
-            constructor() {
-                // Vocabulary for natural-looking text generation
-                this.subjects = ['system', 'network', 'algorithm', 'protocol', 'framework'];
-                this.verbs = ['processes', 'manages', 'optimizes', 'handles', 'transforms'];
-                this.adjectives = ['dynamic', 'advanced', 'intelligent', 'secure', 'adaptive'];
-                this.technicalNouns = ['data', 'computation', 'encryption', 'resolution', 'configuration'];
-            }
+  <script>
+    class SeamlessSteganographer {
+      constructor() {
+        this.subjects = ['system', 'network', 'algorithm', 'protocol', 'framework'];
+        this.verbs = ['processes', 'manages', 'optimizes', 'handles', 'transforms'];
+        this.adjectives = ['dynamic', 'advanced', 'intelligent', 'secure', 'adaptive'];
+        this.technicalNouns = ['data', 'computation', 'encryption', 'resolution', 'configuration'];
+      }
 
-            // Generate a natural-sounding technical sentence
-            generateSentence() {
-                const subject = this.subjects[Math.floor(Math.random() * this.subjects.length)];
-                const verb = this.verbs[Math.floor(Math.random() * this.verbs.length)];
-                const adj = this.adjectives[Math.floor(Math.random() * this.adjectives.length)];
-                const noun = this.technicalNouns[Math.floor(Math.random() * this.technicalNouns.length)];
+      generateSentence() {
+        const subject = this.subjects[Math.floor(Math.random() * this.subjects.length)];
+        const verb = this.verbs[Math.floor(Math.random() * this.verbs.length)];
+        const adj = this.adjectives[Math.floor(Math.random() * this.adjectives.length)];
+        const noun = this.technicalNouns[Math.floor(Math.random() * this.technicalNouns.length)];
+        return `The ${adj} ${subject} ${verb} complex ${noun} efficiently.`;
+      }
 
-                return `The ${adj} ${subject} ${verb} complex ${noun} efficiently.`;
-            }
+      encodeForJavaScript(code) {
+        return btoa(unescape(encodeURIComponent(code)))
+          .match(/.{1,10}/g)
+          .map(chunk => `/* ${chunk} */`);
+      }
 
-            // Encode code into a format that can be embedded in JavaScript
-            encodeForJavaScript(code) {
-                // Base64 encode and split into chunks
-                return btoa(unescape(encodeURIComponent(code)))
-                    .match(/.{1,10}/g) // Split into 10-character chunks
-                    .map(chunk => `/* ${chunk} */`);
-            }
-
-            // Embed code into technical text
-            embedCode(code, key) {
-                // Encrypt the code
-                const encryptedChunks = this.encodeForJavaScript(
-                    CryptoJS.AES.encrypt(code, key).toString()
-                );
-
-                // Generate sentences with embedded code chunks
-                const sentences = [];
-                let chunkIndex = 0;
-
-                // Generate more sentences than chunks to make embedding less obvious
-                for (let i = 0; i < encryptedChunks.length * 3; i++) {
-                    let sentence = this.generateSentence();
-                    
-                    // Randomly insert encrypted chunk
-                    if (chunkIndex < encryptedChunks.length && Math.random() > 0.7) {
-                        sentence += ` ${encryptedChunks[chunkIndex]}`;
-                        chunkIndex++;
-                    }
-
-                    sentences.push(sentence);
-                }
-
-                return sentences.join(' ');
-            }
-
-            // Extract and decrypt embedded code
-            extractCode(text, key) {
-                // Extract encrypted chunks
-                const encryptedChunks = (text.match(/\/\*\s*([^*]+)\s*\*\//g) || [])
-                    .map(chunk => chunk.replace(/\/\*\s*|\s*\*\//g, ''))
-                    .join('');
-
-                // Decrypt
-                const decryptedCode = CryptoJS.AES.decrypt(
-                    atob(decodeURIComponent(escape(encryptedChunks))), 
-                    key
-                ).toString(CryptoJS.enc.Utf8);
-
-                return decryptedCode;
-            }
+      embedCode(code, key) {
+        const encrypted = CryptoJS.AES.encrypt(code, key).toString();
+        const encryptedChunks = this.encodeForJavaScript(encrypted);
+        const sentences = [];
+        let chunkIndex = 0;
+        for (let i = 0; i < encryptedChunks.length * 3; i++) {
+          let sentence = this.generateSentence();
+          if (chunkIndex < encryptedChunks.length && Math.random() > 0.7) {
+            sentence += ` ${encryptedChunks[chunkIndex]}`;
+            chunkIndex++;
+          }
+          sentences.push(sentence);
         }
+        return sentences.join(' ');
+      }
 
-        // Create an instance of the steganographer
-        const stego = new SeamlessSteganographer();
+      extractCode(text, key) {
+        const encryptedChunks = (text.match(/\/\*\s*([^*]+)\s*\*\//g) || [])
+          .map(chunk => chunk.replace(/\/\*\s*|\s*\*\//g, ''))
+          .join('');
+        const decrypted = CryptoJS.AES.decrypt(encryptedChunks, key);
+        const decryptedCode = decrypted.toString(CryptoJS.enc.Utf8);
+        return decryptedCode || '⚠️ Failed to decrypt: Possibly wrong key or corrupt input.';
+      }
+    }
 
-        // Embedding function
-        function embedCode() {
-            const codeInput = document.getElementById('codeInput');
-            const encryptionKey = document.getElementById('encryptionKey');
-            const embeddedTextArea = document.getElementById('embeddedText');
+    const stego = new SeamlessSteganographer();
 
-            if (!codeInput.value.trim()) {
-                alert('Please enter code to hide!');
-                return;
-            }
+    function embedCode() {
+      const codeInput = document.getElementById('codeInput');
+      const encryptionKey = document.getElementById('encryptionKey');
+      const embeddedTextArea = document.getElementById('embeddedText');
+      if (!codeInput.value.trim()) {
+        alert('Please enter code to hide!');
+        return;
+      }
+      if (!encryptionKey.value.trim()) {
+        alert('Please enter an encryption key!');
+        return;
+      }
+      try {
+        const embeddedText = stego.embedCode(codeInput.value, encryptionKey.value);
+        embeddedTextArea.value = embeddedText;
+      } catch (error) {
+        alert('Embedding failed: ' + error.message);
+      }
+    }
 
-            if (!encryptionKey.value.trim()) {
-                alert('Please enter an encryption key!');
-                return;
-            }
+    function extractCode() {
+      const extractionText = document.getElementById('extractionText');
+      const decryptionKey = document.getElementById('decryptionKey');
+      const extractedCodeArea = document.getElementById('extractedCode');
+      if (!extractionText.value.trim()) {
+        alert('Please paste the text containing hidden code!');
+        return;
+      }
+      if (!decryptionKey.value.trim()) {
+        alert('Please enter the decryption key!');
+        return;
+      }
+      try {
+        const extractedCode = stego.extractCode(extractionText.value, decryptionKey.value);
+        extractedCodeArea.value = extractedCode;
+      } catch (error) {
+        alert('Extraction failed: ' + error.message);
+      }
+    }
 
-            try {
-                const embeddedText = stego.embedCode(
-                    codeInput.value, 
-                    encryptionKey.value
-                );
+    function copyEmbeddedText() {
+      const embeddedText = document.getElementById('embeddedText');
+      navigator.clipboard.writeText(embeddedText.value)
+        .then(() => console.log('Copied embedded text!'))
+        .catch(err => alert('Failed to copy: ' + err));
+    }
 
-                embeddedTextArea.value = embeddedText;
-            } catch (error) {
-                alert('Embedding failed: ' + error.message);
-            }
-        }
-
-        // Extraction function
-        function extractCode() {
-            const extractionText = document.getElementById('extractionText');
-            const decryptionKey = document.getElementById('decryptionKey');
-            const extractedCodeArea = document.getElementById('extractedCode');
-
-            if (!extractionText.value.trim()) {
-                alert('Please paste the text containing hidden code!');
-                return;
-            }
-
-            if (!decryptionKey.value.trim()) {
-                alert('Please enter the decryption key!');
-                return;
-            }
-
-            try {
-                const extractedCode = stego.extractCode(
-                    extractionText.value, 
-                    decryptionKey.value
-                );
-
-                extractedCodeArea.value = extractedCode;
-            } catch (error) {
-                alert('Extraction failed: Incorrect key or no hidden code found');
-            }
-        }
-
-        // Copy functions
-        function copyEmbeddedText() {
-            const embeddedText = document.getElementById('embeddedText');
-            embeddedText.select();
-            document.execCommand('copy');
-        }
-
-        function copyExtractedCode() {
-            const extractedCode = document.getElementById('extractedCode');
-            extractedCode.select();
-            document.execCommand('copy');
-        }
-    </script>
+    function copyExtractedCode() {
+      const extractedCode = document.getElementById('extractedCode');
+      navigator.clipboard.writeText(extractedCode.value)
+        .then(() => console.log('Copied extracted code!'))
+        .catch(err => alert('Failed to copy: ' + err));
+    }
+  </script>
 </body>
 </html>
