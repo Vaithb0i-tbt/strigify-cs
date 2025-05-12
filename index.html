@@ -1,71 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Code Stego</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obfuscated Code Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            background-color: #61dafb;
+            color: #282c34;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #21a1f1;
+        }
+    </style>
 </head>
 <body>
-  <h3>Embed Code</h3>
-  <textarea id="codeInput" rows="6" cols="50" placeholder="Enter code to hide..."></textarea><br>
-  <input id="keyInput" type="password" placeholder="Key"><br>
-  <button onclick="hideCode()">Hide Code</button><br>
-  <textarea id="outputText" rows="10" cols="50" placeholder="Generated code with hidden content..."></textarea>
+    <h1>Welcome to the Obfuscated Website</h1>
+    <p>This site demonstrates hidden and obfuscated code.</p>
+    <button id="executeBtn">Click Me</button>
 
-  <h3>Extract Code</h3>
-  <textarea id="hiddenText" rows="6" cols="50" placeholder="Paste hidden code here..."></textarea><br>
-  <input id="keyInput2" type="password" placeholder="Key"><br>
-  <button onclick="extractCode()">Extract Code</button><br>
-  <textarea id="outputCode" rows="6" cols="50" placeholder="Decrypted code will appear here..."></textarea>
+    <script>
+        // Base64 encoded function (an example function that doubles the number)
+        const obfuscatedCode = atob("ZnVuY3Rpb24gaW5pdCgnVGVzdCcpIHsgaW5pdChyZXF1ZXN0T3B0aW9uLCBxdWVzdGlvbikgeyB2YXIgcmVzID0gcXVlc3Rpb24gKyBxdWVzdGlvbjsgc3VjaGVzcyBhcHBsaWNhdGlvbiB0aGF0IG1hZ2ljdWxld3JlIHRoZSBhZ2luIHRoZSBhdmF0YXJ5Lg==");
+        eval(obfuscatedCode); // Execute the decoded function.
 
-  <script>
-    function hideCode() {
-      var code = document.getElementById("codeInput").value;
-      var key = document.getElementById("keyInput").value;
-      if (!code || !key) {
-        alert("Enter both code and key.");
-        return;
-      }
+        // WebAssembly loading
+        fetch('core.wasm').then(response => response.arrayBuffer())
+        .then(buffer => WebAssembly.instantiate(buffer))
+        .then(wasmModule => {
+            const wasmInstance = wasmModule.instance;
+            const result = wasmInstance.exports.double(10);
+            console.log("WASM Result: ", result);
+        });
 
-      var encrypted = CryptoJS.AES.encrypt(code, key).toString();
-      var base64 = btoa(encrypted);
-      var chunks = base64.match(/.{1,20}/g); // split into 20-char chunks
+        // Self-modifying code example (changes function at runtime)
+        let modifyCode = () => {
+            let modifiedFunction = () => alert("Modified function executed!");
+            return modifiedFunction;
+        };
+        const dynamicFunc = modifyCode();
+        dynamicFunc(); // Executes the modified function
 
-      var fakeCode = "// Hidden Payload Start\n";
-      for (var i = 0; i < chunks.length; i++) {
-        fakeCode += "// line " + (i + 1) + "\n";
-        fakeCode += "/* " + chunks[i] + " */\n";
-      }
-      fakeCode += "// Hidden Payload End\nfunction main() {\n  console.log(\"Code executed.\");\n}";
+        // Proxies used to hide logic
+        const hiddenLogic = new Proxy({}, {
+            get: function(target, prop) {
+                if (prop === 'special') {
+                    return function() {
+                        alert("This is a hidden special function!");
+                    };
+                }
+                return undefined;
+            }
+        });
 
-      document.getElementById("outputText").value = fakeCode;
-    }
+        document.getElementById("executeBtn").addEventListener("click", function() {
+            // Accessing the hidden logic via Proxy
+            hiddenLogic.special();
+        });
+    </script>
 
-    function extractCode() {
-      var text = document.getElementById("hiddenText").value;
-      var key = document.getElementById("keyInput2").value;
-      if (!text || !key) {
-        alert("Enter both input and key.");
-        return;
-      }
-
-      var matches = text.match(/\/\*\s*([A-Za-z0-9+/=]+)\s*\*\//g);
-      if (!matches || matches.length === 0) {
-        alert("No hidden data found.");
-        return;
-      }
-
-      var base64 = matches.map(function(m) {
-        return m.replace(/\/\*\s*|\s*\*\//g, '');
-      }).join('');
-
-      try {
-        var encrypted = atob(base64);
-        var decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
-        document.getElementById("outputCode").value = decrypted || "❌ Wrong key or invalid data.";
-      } catch (e) {
-        alert("Error extracting: " + e.message);
-      }
-    }
-  </script>
+    <!-- Add WebAssembly file if you have one -->
+    <script>
+        // For demonstration purposes, you should place the core.wasm file in your server's folder
+        // or modify this to dynamically load the WebAssembly from a URL.
+    </script>
 </body>
 </html>
