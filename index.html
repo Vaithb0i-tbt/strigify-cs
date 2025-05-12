@@ -5,16 +5,18 @@
   <title>100% HML JS Obfuscator</title>
 </head>
 <body>
-  <h1>Homemade JS Obfuscator (Browser-based)</h1>
-  <textarea id="inputCode" rows="10" cols="80" placeholder="Enter your JavaScript here..."></textarea><br>
+  <h1>Homemade JS Obfuscator (Browser-Based)</h1>
+  <textarea id="inputCode" rows="10" cols="80" placeholder="Enter your JavaScript code here..."></textarea><br>
   <button onclick="obfuscate()">Obfuscate</button>
+
   <h3>Obfuscated Output:</h3>
-  <textarea id="outputCode" rows="10" cols="80"></textarea><br>
+  <textarea id="outputCode" rows="10" cols="80" readonly></textarea><br>
   <button onclick="runObfuscated()">Run Obfuscated Code</button>
 
   <script>
-    function encodeString(str) {
-      return str.split('').map(c => '\\x' + c.charCodeAt(0).toString(16)).join('');
+    function encodeStringToCharCodes(str) {
+      const chars = str.split('').map(c => c.charCodeAt(0));
+      return `eval(String.fromCharCode(${chars.join(',')}))`;
     }
 
     function renameVars(code) {
@@ -26,20 +28,20 @@
         varMap[name] = newName;
         return `${decl} ${newName}`;
       });
-      code = code.replace(/\b\w+\b/g, (word) => varMap[word] || word);
+      code = code.replace(/\b\w+\b/g, word => varMap[word] || word);
       return code;
     }
 
     function obfuscate() {
       const code = document.getElementById('inputCode').value;
       const renamed = renameVars(code);
-      const encoded = encodeString(renamed);
-      document.getElementById('outputCode').value = `eval("${encoded}")`;
+      const encoded = encodeStringToCharCodes(renamed);
+      document.getElementById('outputCode').value = encoded;
     }
 
     function runObfuscated() {
       const obfuscated = document.getElementById('outputCode').value;
-      eval(obfuscated);
+      eval(obfuscated);  // Safe since we generated this
     }
   </script>
 </body>
