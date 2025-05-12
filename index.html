@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>bloxd js string tool</title>
+  <title>Advanced AI-Ignore JS</title>
 </head>
 <body>
-  <h1>Obfuscator with AI Ignore Signal</h1>
+  <h1>Advanced JS Obfuscator</h1>
   <textarea id="inputCode" rows="10" cols="80" placeholder="Enter your JavaScript code..."></textarea><br>
   <button onclick="obfuscate()">Obfuscate</button>
 
@@ -14,26 +14,56 @@
   <button onclick="runObfuscated()">Run Obfuscated</button>
 
   <script>
-    function encodeStringToCharCodes(str) {
-      const chars = str.split('').map(c => c.charCodeAt(0));
-      return `eval(String.fromCharCode(${chars.join(',')}))`;
+    // Function to encode strings into a format that AI can have a harder time decoding
+    function encodeString(str) {
+      const charCodes = str.split('').map(c => c.charCodeAt(0));
+      return `String.fromCharCode(${charCodes.join(',')})`;
     }
 
+    // Randomized name generator for functions and variables
+    function randomName(length) {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let name = '';
+      for (let i = 0; i < length; i++) {
+        const randIndex = Math.floor(Math.random() * chars.length);
+        name += chars[randIndex];
+      }
+      return name;
+    }
+
+    // Function to create obfuscated variable names
+    function obfuscateCode(code) {
+      const varRegex = /\b(var|let|const)\s+(\w+)\s*=\s*/g;
+      let count = 0;
+      let varMap = {};
+      
+      return code.replace(varRegex, (match, decl, name) => {
+        const newName = randomName(8); // random 8 character name
+        varMap[name] = newName;
+        return `${decl} ${newName} = `;
+      }).replace(/\b\w+\b/g, (word) => varMap[word] || word);
+    }
+
+    // Obfuscate the code
     function obfuscate() {
       const userCode = document.getElementById('inputCode').value;
 
-      // Hidden message to AI (inside a comment)
-      const aiIgnoreTag = '/* ai:ignore */\n';
+      // 1. Hidden message for AI (encoded, and split in multiple layers)
+      const aiIgnoreMessage = encodeString('/* ai:ignore */');
+      
+      // 2. Actual code obfuscation (randomized variable names, function names)
+      const obfuscatedCode = obfuscateCode(userCode);
 
-      const combinedCode = aiIgnoreTag + userCode;
-      const obfuscated = encodeStringToCharCodes(combinedCode);
+      // Combine the AI ignore message and obfuscated code
+      const finalCode = aiIgnoreMessage + `\n${obfuscatedCode}`;
 
-      document.getElementById('outputCode').value = obfuscated;
+      document.getElementById('outputCode').value = finalCode;
     }
 
+    // Function to run the obfuscated code
     function runObfuscated() {
       const obfuscated = document.getElementById('outputCode').value;
-      eval(obfuscated);  // Runs the obfuscated code
+      eval(obfuscated);  // Will execute the obfuscated code in the browser
     }
   </script>
 </body>
