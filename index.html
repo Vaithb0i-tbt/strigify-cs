@@ -2,214 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Auto-Camouflage Code Embedding</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Code Steganography</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .copy-tooltip {
+            position: relative;
+        }
+        .copy-tooltip::after {
+            content: 'Copied!';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: green;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-tooltip:active::after {
+            opacity: 1;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white shadow-2xl rounded-xl p-8 w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Auto-Camouflage Code Embedding</h1>
-        <p class="text-center text-gray-600 mb-6">
-            Automatically generate camouflage text to hide your code with multi-layer encryption.
-        </p>
-
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-4xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">🕵️ Steganographic Code Embedding</h1>
+        
         <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-gray-700 font-bold mb-2">Code to Embed</label>
+                    <label class="block text-gray-700 font-bold mb-2">Code to Hide</label>
                     <textarea id="codeInput" rows="8" class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Paste your code here..."></textarea>
+                        placeholder="Enter the code you want to hide..."></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-gray-700 font-bold mb-2">Encryption Key</label>
+                    <label class="block text-gray-700 font-bold mb-2">Secret Key</label>
                     <input type="password" id="encryptionKey" 
                         class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Enter encryption key">
+                        placeholder="Enter a secret encryption key">
                 </div>
 
                 <button onclick="embedCode()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                    Embed Code
+                    Hide Code
                 </button>
+
+                <div class="mt-4">
+                    <label class="block text-gray-700 font-bold mb-2">Embedded Text</label>
+                    <div class="relative">
+                        <textarea id="embeddedText" rows="6" readonly 
+                            class="w-full border rounded p-2 bg-gray-100" 
+                            placeholder="Embedded text will appear here..."></textarea>
+                        <button onclick="copyEmbeddedText()" 
+                            class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded copy-tooltip">
+                            📋 Copy
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-gray-700 font-bold mb-2">Extraction Text</label>
+                    <label class="block text-gray-700 font-bold mb-2">Text to Extract From</label>
                     <textarea id="extractionText" rows="8" class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Paste embedded text here..."></textarea>
+                        placeholder="Paste the text containing hidden code..."></textarea>
                 </div>
 
                 <div>
                     <label class="block text-gray-700 font-bold mb-2">Decryption Key</label>
                     <input type="password" id="decryptionKey" 
                         class="w-full border rounded p-2 bg-gray-50" 
-                        placeholder="Enter decryption key">
+                        placeholder="Enter the secret encryption key">
                 </div>
 
                 <button onclick="extractCode()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
                     Extract Code
                 </button>
 
-                <div id="extractedCodeArea" class="hidden">
+                <div class="mt-4">
                     <label class="block text-gray-700 font-bold mb-2">Extracted Code</label>
-                    <pre id="extractedCode" class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto"></pre>
+                    <div class="relative">
+                        <textarea id="extractedCode" rows="6" readonly 
+                            class="w-full border rounded p-2 bg-gray-100" 
+                            placeholder="Extracted code will appear here..."></textarea>
+                        <button onclick="copyExtractedCode()" 
+                            class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded copy-tooltip">
+                            📋 Copy
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        class AutoCamouflageStegoCoder {
+        class SeamlessSteganographer {
             constructor() {
-                this.MAGIC_MARKER = 'AUTOCAMO_V1_';
-                this.lorem = [
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                    "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
-                    "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui.",
-                    "Nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
-                    "Sed ut perspiciatis unde omnis iste natus error sit voluptatem.",
-                    "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut.",
-                    "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.",
-                    "Consectetur, adipisci velit, sed quia non numquam eius modi tempora."
-                ];
-                this.technicalTerms = [
-                    "algorithm", "encryption", "steganography", "cryptography", 
-                    "decryption", "blockchain", "cybersecurity", "network", 
-                    "protocol", "data", "information", "system", "software"
-                ];
+                // Vocabulary for natural-looking text generation
+                this.subjects = ['system', 'network', 'algorithm', 'protocol', 'framework'];
+                this.verbs = ['processes', 'manages', 'optimizes', 'handles', 'transforms'];
+                this.adjectives = ['dynamic', 'advanced', 'intelligent', 'secure', 'adaptive'];
+                this.technicalNouns = ['data', 'computation', 'encryption', 'resolution', 'configuration'];
             }
 
-            generateCamouflageText(length = 50) {
+            // Generate a natural-sounding technical sentence
+            generateSentence() {
+                const subject = this.subjects[Math.floor(Math.random() * this.subjects.length)];
+                const verb = this.verbs[Math.floor(Math.random() * this.verbs.length)];
+                const adj = this.adjectives[Math.floor(Math.random() * this.adjectives.length)];
+                const noun = this.technicalNouns[Math.floor(Math.random() * this.technicalNouns.length)];
+
+                return `The ${adj} ${subject} ${verb} complex ${noun} efficiently.`;
+            }
+
+            // Encode code into a format that can be embedded in JavaScript
+            encodeForJavaScript(code) {
+                // Base64 encode and split into chunks
+                return btoa(unescape(encodeURIComponent(code)))
+                    .match(/.{1,10}/g) // Split into 10-character chunks
+                    .map(chunk => `/* ${chunk} */`);
+            }
+
+            // Embed code into technical text
+            embedCode(code, key) {
+                // Encrypt the code
+                const encryptedChunks = this.encodeForJavaScript(
+                    CryptoJS.AES.encrypt(code, key).toString()
+                );
+
+                // Generate sentences with embedded code chunks
                 const sentences = [];
-                let currentLength = 0;
+                let chunkIndex = 0;
 
-                while (currentLength < length) {
-                    // Mix lorem ipsum with technical terms
-                    const loremSentence = this.lorem[Math.floor(Math.random() * this.lorem.length)];
-                    const technicalWord = this.technicalTerms[Math.floor(Math.random() * this.technicalTerms.length)];
+                // Generate more sentences than chunks to make embedding less obvious
+                for (let i = 0; i < encryptedChunks.length * 3; i++) {
+                    let sentence = this.generateSentence();
                     
-                    // Randomly inject technical term
-                    const modifiedSentence = loremSentence.replace(
-                        this.lorem[0].split(' ')[Math.floor(Math.random() * 5)],
-                        technicalWord
-                    );
+                    // Randomly insert encrypted chunk
+                    if (chunkIndex < encryptedChunks.length && Math.random() > 0.7) {
+                        sentence += ` ${encryptedChunks[chunkIndex]}`;
+                        chunkIndex++;
+                    }
 
-                    sentences.push(modifiedSentence);
-                    currentLength += modifiedSentence.length;
+                    sentences.push(sentence);
                 }
 
                 return sentences.join(' ');
             }
 
-            embedCode(code, key) {
-                // Generate camouflage text
-                const camouflageText = this.generateCamouflageText();
-                
-                // Compress and encrypt the code
-                const compressedCode = this.compress(code);
-                const encryptedCode = this.encrypt(compressedCode, key);
-                
-                // Create a unique marker
-                const marker = this.generateMarker();
-                
-                // Embed the encrypted code in the text
-                return this.strategicEmbedding(camouflageText, marker + encryptedCode);
-            }
+            // Extract and decrypt embedded code
+            extractCode(text, key) {
+                // Extract encrypted chunks
+                const encryptedChunks = (text.match(/\/\*\s*([^*]+)\s*\*\//g) || [])
+                    .map(chunk => chunk.replace(/\/\*\s*|\s*\*\//g, ''))
+                    .join('');
 
-            extractCode(embeddedText, key) {
-                // Find the embedded code
-                const extractedData = this.findEmbeddedCode(embeddedText);
-                
-                if (!extractedData) {
-                    throw new Error('No embedded code found');
-                }
+                // Decrypt
+                const decryptedCode = CryptoJS.AES.decrypt(
+                    atob(decodeURIComponent(escape(encryptedChunks))), 
+                    key
+                ).toString(CryptoJS.enc.Utf8);
 
-                // Decrypt and decompress
-                const decryptedCode = this.decrypt(extractedData, key);
-                return this.decompress(decryptedCode);
-            }
-
-            // Basic compression (can be enhanced)
-            compress(code) {
-                return btoa(unescape(encodeURIComponent(code)));
-            }
-
-            // Decompression
-            decompress(compressedCode) {
-                return decodeURIComponent(escape(atob(compressedCode)));
-            }
-
-            // Encryption using AES
-            encrypt(code, key) {
-                return CryptoJS.AES.encrypt(code, key).toString();
-            }
-
-            // Decryption
-            decrypt(encryptedCode, key) {
-                const bytes = CryptoJS.AES.decrypt(encryptedCode, key);
-                return bytes.toString(CryptoJS.enc.Utf8);
-            }
-
-            // Generate a unique marker
-            generateMarker() {
-                const timestamp = Date.now().toString(36);
-                return `${this.MAGIC_MARKER}${timestamp}_`;
-            }
-
-            // Strategic embedding
-            strategicEmbedding(text, embeddedCode) {
-                const words = text.split(/\s+/);
-                const insertPoints = this.chooseInsertionPoints(words.length);
-                
-                insertPoints.forEach((point, index) => {
-                    const chunk = embeddedCode.substr(index * 10, 10);
-                    words.splice(point, 0, chunk);
-                });
-
-                return words.join(' ');
-            }
-
-            // Choose strategic insertion points
-            chooseInsertionPoints(textLength) {
-                const numInsertions = Math.max(3, Math.floor(textLength / 20));
-                const points = new Set();
-                
-                while (points.size < numInsertions) {
-                    points.add(Math.floor(Math.random() * textLength));
-                }
-                
-                return Array.from(points).sort((a, b) => a - b);
-            }
-
-            // Find embedded code
-            findEmbeddedCode(text) {
-                const words = text.replace(/[^\w\s]/g, '').split(/\s+/);
-                const potentialEmbeddedCode = words.filter(word => 
-                    word.startsWith(this.MAGIC_MARKER)
-                );
-
-                if (potentialEmbeddedCode.length === 0) {
-                    return null;
-                }
-
-                const fullEmbeddedCode = potentialEmbeddedCode.join('');
-                const markerEnd = fullEmbeddedCode.indexOf('_', this.MAGIC_MARKER.length);
-                
-                return fullEmbeddedCode.substring(markerEnd + 1);
+                return decryptedCode;
             }
         }
 
-        const autoCamouflageStegoCoder = new AutoCamouflageStegoCoder();
+        // Create an instance of the steganographer
+        const stego = new SeamlessSteganographer();
 
+        // Embedding function
         function embedCode() {
             const codeInput = document.getElementById('codeInput');
             const encryptionKey = document.getElementById('encryptionKey');
+            const embeddedTextArea = document.getElementById('embeddedText');
 
             if (!codeInput.value.trim()) {
-                alert('Please enter code to embed!');
+                alert('Please enter code to hide!');
                 return;
             }
 
@@ -219,32 +190,25 @@
             }
 
             try {
-                const embeddedText = autoCamouflageStegoCoder.embedCode(
+                const embeddedText = stego.embedCode(
                     codeInput.value, 
                     encryptionKey.value
                 );
 
-                // Create a downloadable text file
-                const blob = new Blob([embeddedText], { type: 'text/plain' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'embedded_code.txt';
-                link.click();
-
-                alert('Code embedded successfully! File downloaded.');
+                embeddedTextArea.value = embeddedText;
             } catch (error) {
                 alert('Embedding failed: ' + error.message);
             }
         }
 
+        // Extraction function
         function extractCode() {
             const extractionText = document.getElementById('extractionText');
             const decryptionKey = document.getElementById('decryptionKey');
-            const extractedCodeArea = document.getElementById('extractedCodeArea');
-            const extractedCodeEl = document.getElementById('extractedCode');
+            const extractedCodeArea = document.getElementById('extractedCode');
 
             if (!extractionText.value.trim()) {
-                alert('Please paste the embedded text!');
+                alert('Please paste the text containing hidden code!');
                 return;
             }
 
@@ -254,16 +218,28 @@
             }
 
             try {
-                const extractedCode = autoCamouflageStegoCoder.extractCode(
+                const extractedCode = stego.extractCode(
                     extractionText.value, 
                     decryptionKey.value
                 );
 
-                extractedCodeEl.textContent = extractedCode;
-                extractedCodeArea.classList.remove('hidden');
+                extractedCodeArea.value = extractedCode;
             } catch (error) {
-                alert('Extraction failed: ' + error.message);
+                alert('Extraction failed: Incorrect key or no hidden code found');
             }
+        }
+
+        // Copy functions
+        function copyEmbeddedText() {
+            const embeddedText = document.getElementById('embeddedText');
+            embeddedText.select();
+            document.execCommand('copy');
+        }
+
+        function copyExtractedCode() {
+            const extractedCode = document.getElementById('extractedCode');
+            extractedCode.select();
+            document.execCommand('copy');
         }
     </script>
 </body>
