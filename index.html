@@ -1,86 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bloxd.io Script Hider</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 700px;
-      margin: auto;
-    }
-    textarea {
-      width: 100%;
-      height: 200px;
-      margin-top: 10px;
-    }
-    .output {
-      white-space: pre-wrap;
-      background: #f3f3f3;
-      padding: 10px;
-      border-radius: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Steganographic Code Embedding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
-<body>
-  <h1>Bloxd.io Script Hider</h1>
-  <p>Upload a .txt file to encode its contents and generate hidden code you can paste into Bloxd.io.</p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-2xl rounded-xl p-8 w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Steganographic Code Embedding</h1>
+        <p class="text-center text-gray-600 mb-6">
+            Embed your code within seemingly innocent text files with multi-layer encryption and camouflage.
+        </p>
 
-  <input type="file" id="fileInput" accept=".txt"><br><br>
-  <button onclick="processFile()">Convert and Generate</button>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Code to Embed</label>
+                    <textarea id="codeInput" rows="6" class="w-full border rounded p-2 bg-gray-50" 
+                        placeholder="Paste your code here..."></textarea>
+                </div>
 
-  <h3>Base64 Encoded:</h3>
-  <div class="output" id="base64Output"></div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Camouflage Text</label>
+                    <textarea id="camouflageText" rows="4" class="w-full border rounded p-2 bg-gray-50" 
+                        placeholder="Enter text to hide your code within..."></textarea>
+                </div>
 
-  <h3>Bloxd Code Snippet:</h3>
-  <textarea readonly id="bloxdCode"></textarea>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Encryption Key</label>
+                    <input type="password" id="encryptionKey" 
+                        class="w-full border rounded p-2 bg-gray-50" 
+                        placeholder="Enter encryption key">
+                </div>
 
-  <script>
-    function base64Encode(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
+                <button onclick="embedCode()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+                    Embed Code
+                </button>
+            </div>
 
-    function processFile() {
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) return alert("Please select a .txt file first.");
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Extraction Text</label>
+                    <textarea id="extractionText" rows="6" class="w-full border rounded p-2 bg-gray-50" 
+                        placeholder="Paste embedded text here..."></textarea>
+                </div>
 
-      const reader = new FileReader();
-      reader.onload = function () {
-        const text = reader.result;
-        const encoded = base64Encode(text);
-        document.getElementById('base64Output').textContent = encoded;
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Decryption Key</label>
+                    <input type="password" id="decryptionKey" 
+                        class="w-full border rounded p-2 bg-gray-50" 
+                        placeholder="Enter decryption key">
+                </div>
 
-        // Generate Bloxd.io-compatible decoding code
-        const bloxdSnippet = `
-function base64Decode(str) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  let output = "";
-  let buffer = 0, bits = 0;
+                <button onclick="extractCode()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+                    Extract Code
+                </button>
 
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === '=') break;
-    buffer = (buffer << 6) + chars.indexOf(str[i]);
-    bits += 6;
-    if (bits >= 8) {
-      bits -= 8;
-      output += String.fromCharCode((buffer >> bits) & 0xFF);
-    }
-  }
+                <div id="extractedCodeArea" class="hidden">
+                    <label class="block text-gray-700 font-bold mb-2">Extracted Code</label>
+                    <pre id="extractedCode" class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  return output;
-}
+    <script>
+        class StegoCoder {
+            constructor() {
+                this.MAGIC_MARKER = 'STEGO_V1_';
+            }
 
-const hiddenData = "${encoded}";
-const decoded = base64Decode(hiddenData);
-console.log(decoded);
-// Use decoded in your game logic
-        `.trim();
+            embedCode(code, camouflageText, key) {
+                // Compress and encrypt the code
+                const compressedCode = this.compress(code);
+                const encryptedCode = this.encrypt(compressedCode, key);
+                
+                // Create a unique marker
+                const marker = this.generateMarker();
+                
+                // Embed the encrypted code in the text
+                return this.strategicEmbedding(camouflageText, marker + encryptedCode);
+            }
 
-        document.getElementById('bloxdCode').value = bloxdSnippet;
-      };
-      reader.readAsText(file);
-    }
-  </script>
+            extractCode(embeddedText, key) {
+                // Find the embedded code
+                const extractedData = this.findEmbeddedCode(embeddedText);
+                
+                if (!extractedData) {
+                    throw new Error('No embedded code found');
+                }
+
+                // Decrypt and decompress
+                const decryptedCode = this.decrypt(extractedData, key);
+                return this.decompress(decryptedCode);
+            }
+
+            // Basic compression (can be enhanced)
+            compress(code) {
+                return btoa(unescape(encodeURIComponent(code)));
+            }
+
+            // Decompression
+            decompress(compressedCode) {
+                return decodeURIComponent(escape(atob(compressedCode)));
+            }
+
+            // Encryption using AES
+            encrypt(code, key) {
+                return CryptoJS.AES.encrypt(code, key).toString();
+            }
+
+            // Decryption
+            decrypt(encryptedCode, key) {
+                const bytes = CryptoJS.AES.decrypt(encryptedCode, key);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            }
+
+            // Generate a unique marker
+            generateMarker() {
+                const timestamp = Date.now().toString(36);
+                return `${this.MAGIC_MARKER}${timestamp}_`;
+            }
+
+            // Strategic embedding
+            strategicEmbedding(text, embeddedCode) {
+                const words = text.split(/\s+/);
+                const insertPoints = this.chooseInsertionPoints(words.length);
+                
+                insertPoints.forEach((point, index) => {
+                    const chunk = embeddedCode.substr(index * 10, 10);
+                    words.splice(point, 0, chunk);
+                });
+
+                return words.join(' ');
+            }
+
+            // Choose strategic insertion points
+            chooseInsertionPoints(textLength) {
+                const numInsertions = Math.max(3, Math.floor(textLength / 20));
+                const points = new Set();
+                
+                while (points.size < numInsertions) {
+                    points.add(Math.floor(Math.random() * textLength));
+                }
+                
+                return Array.from(points).sort((a, b) => a - b);
+            }
+
+            // Find embedded code
+            findEmbeddedCode(text) {
+                const words = text.replace(/[^\w\s]/g, '').split(/\s+/);
+                const potentialEmbeddedCode = words.filter(word => 
+                    word.startsWith(this.MAGIC_MARKER)
+                );
+
+                if (potentialEmbeddedCode.length === 0) {
+                    return null;
+                }
+
+                const fullEmbeddedCode = potentialEmbeddedCode.join('');
+                const markerEnd = fullEmbeddedCode.indexOf('_', this.MAGIC_MARKER.length);
+                
+                return fullEmbeddedCode.substring(markerEnd + 1);
+            }
+        }
+
+        const stegoCoder = new StegoCoder();
+
+        function embedCode() {
+            const codeInput = document.getElementById('codeInput');
+            const camouflageText = document.getElementById('camouflageText');
+            const encryptionKey = document.getElementById('encryptionKey');
+
+            if (!codeInput.value.trim()) {
+                alert('Please enter code to embed!');
+                return;
+            }
+
+            if (!camouflageText.value.trim()) {
+                alert('Please provide camouflage text!');
+                return;
+            }
+
+            if (!encryptionKey.value.trim()) {
+                alert('Please enter an encryption key!');
+                return;
+            }
+
+            try {
+                const embeddedText = stegoCoder.embedCode(
+                    codeInput.value, 
+                    camouflageText.value, 
+                    encryptionKey.value
+                );
+
+                // Create a downloadable text file
+                const blob = new Blob([embeddedText], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'embedded_code.txt';
+                link.click();
+
+                alert('Code embedded successfully! File downloaded.');
+            } catch (error) {
+                alert('Embedding failed: ' + error.message);
+            }
+        }
+
+        function extractCode() {
+            const extractionText = document.getElementById('extractionText');
+            const decryptionKey = document.getElementById('decryptionKey');
+            const extractedCodeArea = document.getElementById('extractedCodeArea');
+            const extractedCodeEl = document.getElementById('extractedCode');
+
+            if (!extractionText.value.trim()) {
+                alert('Please paste the embedded text!');
+                return;
+            }
+
+            if (!decryptionKey.value.trim()) {
+                alert('Please enter the decryption key!');
+                return;
+            }
+
+            try {
+                const extractedCode = stegoCoder.extractCode(
+                    extractionText.value, 
+                    decryptionKey.value
+                );
+
+                extractedCodeEl.textContent = extractedCode;
+                extractedCodeArea.classList.remove('hidden');
+            } catch (error) {
+                alert('Extraction failed: ' + error.message);
+            }
+        }
+    </script>
 </body>
 </html>
